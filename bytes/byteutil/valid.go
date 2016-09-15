@@ -1,15 +1,19 @@
 package byteutil
 
-import "unicode/utf8"
+import "unicode"
+
+func IsASCII(v byte) bool { // {{{
+	return v <= unicode.MaxASCII
+} // }}}
 
 // --[ 0-9 ]--
 func IsNumeric(v byte) bool { // {{{
-	return v < utf8.RuneSelf && ('0' <= v && v <= '9')
+	return '0' <= v && v <= '9'
 } // }}}
 
 // --[ A-Za-z ]--
 func IsAlphabetic(v byte) bool { // {{{
-	return v < utf8.RuneSelf && (('A' <= v && v <= 'Z') || ('a' <= v && v <= 'z'))
+	return ('A' <= v && v <= 'Z') || ('a' <= v && v <= 'z')
 } // }}}
 
 // --[ 0-9A-Za-z ]--

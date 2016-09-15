@@ -5,15 +5,11 @@ import "unicode/utf8"
 import "github.com/ateleshev/go-bin/bytes/byteutil"
 
 const (
-	PathStartByte = '/'
-
-	MinServerLen = 1                // a | localhost | localhost:8080 | 127.0.0.1:8080
-	MinPathLen   = 1                // / | /path/to | /path/to/id/12345
-	MinLen       = 7 + MinServerLen // --[ http://a ]--
+	MinLen = 8 // --[ http://a ]--
 )
 
 var (
-	httpScheme = []byte("http")
+	schemePrefix = []byte("http")
 
 	ErrIsNotUrlScheme   = errors.New("Is not url scheme")
 	ErrIsNotUrlServer   = errors.New("Is not url server")
@@ -27,12 +23,12 @@ var (
  *
  * @return (index, secure, error)
  */
-func FetchSchemeIndex(v []byte) (int, bool, error) { // {{{
+func SchemeIndex(v []byte) (int, bool, error) { // {{{
 	var i int
 	var secure bool
 
-	for i < len(httpScheme) {
-		if v[i] == utf8.RuneSelf || byteutil.ToLower(v[i]) != httpScheme[i] {
+	for i < len(schemePrefix) {
+		if v[i] == utf8.RuneSelf || byteutil.ToLower(v[i]) != schemePrefix[i] {
 			return 0, false, ErrIsNotUrlScheme
 		}
 		i++
@@ -54,25 +50,23 @@ func FetchSchemeIndex(v []byte) (int, bool, error) { // {{{
  * user:pass@host:port
  * user:pass@127.0.0.1:port
  */
-func FetchServerIndex(v []byte) (int, error) { // {{{
+func AuthorityIndex(v []byte) (int, error) { // {{{
 	var i int
 	for i < len(v) {
-		if byteutil.IsWordCharacter(v[i]) {
-			i++
-			continue
+		if !byteutil.IsASCII(v[i]) {
+			goto end_server_index
 		}
 
 		switch v[i] {
-		case '.', ':', '@', '!', '~', '-':
-			i++
-			continue
+		case '/', '?', '#', ' ':
+			goto end_server_index
 		}
 
-		goto end_server_index
+		i++
 	}
 
 end_server_index:
-	if i < MinServerLen {
+	if i < 1 {
 		return 0, ErrIsNotUrlServer
 	}
 
@@ -82,31 +76,30 @@ end_server_index:
 /**
  * /some/path/123456
  */
-func FetchPathIndex(v []byte) (int, error) { // {{{
-	var i int
+func PathIndex(v []byte) (int, error) { // {{{
+	var i, size int
 
-	if v[i] != PathStartByte {
+	if v[i] != '/' {
 		goto end_path_index
 	}
 	i++
 
 	for i < len(v) {
-		if byteutil.IsWordCharacter(v[i]) {
-			i++
-			continue
-		}
-
+		size = 1
 		switch v[i] {
-		case '.', ':', '@', '!', '~', '-', '/':
-			i++
-			continue
+		case '?', '#', ' ':
+			goto end_path_index
 		}
 
-		goto end_path_index
+		if v[i] == utf8.RuneSelf {
+			_, size = utf8.DecodeRune(v[i:])
+		}
+
+		i += size
 	}
 
 end_path_index:
-	if i < MinPathLen {
+	if i < 1 {
 		return 0, ErrIsNotUrlPath
 	}
 
@@ -116,13 +109,65 @@ end_path_index:
 /**
  * ?param1=123&param2=abcd&form1[column1]=data
  */
-func FetchQueryIndex(v []byte) (int, error) { // {{{
-	return 0, ErrIsNotUrlQuery
+func QueryIndex(v []byte) (int, error) { // {{{
+	var i, size int
+
+	if v[i] != '?' {
+		goto end_query_index
+	}
+	i++
+
+	for i < len(v) {
+		size = 1
+		switch v[i] {
+		case '#', ' ':
+			goto end_query_index
+		}
+
+		if v[i] == utf8.RuneSelf {
+			_, size = utf8.DecodeRune(v[i:])
+		}
+
+		i += size
+	}
+
+end_query_index:
+	if i < 1 {
+		return 0, ErrIsNotUrlQuery
+	}
+
+	return i, nil
 } // }}}
 
 /**
  * #param1=1;form[abc]=123;param2=test
  */
-func FetchFragmentIndex(v []byte) (int, error) { // {{{
-	return 0, ErrIsNotUrlFragment
+func FragmentIndex(v []byte) (int, error) { // {{{
+	var i, size int
+
+	if v[i] != '#' {
+		goto end_fragment_index
+	}
+	i++
+
+	for i < len(v) {
+		size = 1
+		switch v[i] {
+		case ' ':
+			goto end_fragment_index
+		}
+
+		if v[i] == utf8.RuneSelf {
+			_, size = utf8.DecodeRune(v[i:])
+		}
+
+		i += size
+	}
+
+end_fragment_index:
+	if i < 1 {
+		return 0, ErrIsNotUrlFragment
+	}
+
+	return i, nil
 } // }}}
