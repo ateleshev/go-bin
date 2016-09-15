@@ -2,7 +2,7 @@ package url
 
 import "errors"
 import "unicode/utf8"
-import "github.com/ateleshev/go-bin/byteconv"
+import "github.com/ateleshev/go-bin/bytes/byteutil"
 
 const (
 	PathStartByte = '/'
@@ -32,13 +32,13 @@ func FetchSchemeIndex(v []byte) (int, bool, error) { // {{{
 	var secure bool
 
 	for i < len(httpScheme) {
-		if v[i] == utf8.RuneSelf || byteconv.ToLower(v[i]) != httpScheme[i] {
+		if v[i] == utf8.RuneSelf || byteutil.ToLower(v[i]) != httpScheme[i] {
 			return 0, false, ErrIsNotUrlScheme
 		}
 		i++
 	}
 
-	if byteconv.ToLower(v[i]) == 's' {
+	if byteutil.ToLower(v[i]) == 's' {
 		secure = true
 		i++
 	}
@@ -57,7 +57,7 @@ func FetchSchemeIndex(v []byte) (int, bool, error) { // {{{
 func FetchServerIndex(v []byte) (int, error) { // {{{
 	var i int
 	for i < len(v) {
-		if byteconv.IsWordCharacter(v[i]) {
+		if byteutil.IsWordCharacter(v[i]) {
 			i++
 			continue
 		}
@@ -91,7 +91,7 @@ func FetchPathIndex(v []byte) (int, error) { // {{{
 	i++
 
 	for i < len(v) {
-		if byteconv.IsWordCharacter(v[i]) {
+		if byteutil.IsWordCharacter(v[i]) {
 			i++
 			continue
 		}

@@ -1,4 +1,4 @@
-package byteconv
+package byteutil
 
 import "unicode/utf8"
 
