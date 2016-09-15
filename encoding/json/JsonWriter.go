@@ -224,6 +224,13 @@ func (this *JsonWriter) Next() *JsonWriter { // {{{
 	return this.writeByte(',')
 } // }}}
 
+func (this *JsonWriter) NextIf(v bool) *JsonWriter { // {{{
+	if v {
+		return this.writeByte(',')
+	}
+	return this
+} // }}}
+
 func (this *JsonWriter) Sep() *JsonWriter { // {{{
 	return this.writeByte(':')
 } // }}}
