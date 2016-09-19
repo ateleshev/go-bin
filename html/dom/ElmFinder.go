@@ -89,7 +89,6 @@ func (this *ElmFinder) Find(path string) ([]byte, error) { // {{{
 					return nil, ErrIsNotHtml
 				}
 			}
-		} else {
 		}
 
 	analyze_html:
