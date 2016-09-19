@@ -1,5 +1,6 @@
 package json
 
+import "io"
 import "sync"
 import "reflect"
 import "strconv"
@@ -8,7 +9,9 @@ import "github.com/ateleshev/go-bin/strings"
 
 var jsonWriterPool = sync.Pool{ // {{{
 	New: func() interface{} {
-		return &JsonWriter{}
+		return &JsonWriter{
+			byteBuf: make([]byte, 1, 1),
+		}
 	},
 } // }}}
 
@@ -25,7 +28,7 @@ func putJsonWriter(instance *JsonWriter) { // {{{
 	jsonWriterPool.Put(instance)
 } // }}}
 
-func NewJsonWriter(w Writer) *JsonWriter { // {{{
+func NewJsonWriter(w io.Writer) *JsonWriter { // {{{
 	jw := getJsonWriter()
 	jw.writer = w
 
@@ -34,8 +37,9 @@ func NewJsonWriter(w Writer) *JsonWriter { // {{{
 
 type JsonWriter struct {
 	htmlEscape bool
-	writer     Writer
+	writer     io.Writer
 	errors     []error
+	byteBuf    []byte
 }
 
 func (this *JsonWriter) SetHtmlEscape(v bool) *JsonWriter { // {{{
@@ -116,7 +120,12 @@ func (this *JsonWriter) writeFloat64(v float64, bitSize int) *JsonWriter { // {{
 } // }}}
 
 func (this *JsonWriter) writeByte(b byte) *JsonWriter { // {{{
-	return this.errorHandler(1, this.writer.WriteByte(b))
+	if w, ok := this.writer.(io.ByteWriter); ok {
+		return this.errorHandler(1, w.WriteByte(b))
+	}
+
+	this.byteBuf[0] = b
+	return this.errorHandler(this.writer.Write(this.byteBuf))
 } // }}}
 
 func (this *JsonWriter) write(v []byte) *JsonWriter { // {{{
