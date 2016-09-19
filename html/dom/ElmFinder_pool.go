@@ -5,7 +5,8 @@ import "sync"
 var elmFinderPool = sync.Pool{ // {{{
 	New: func() interface{} {
 		return &ElmFinder{
-			result: make([]byte, ElmFinderResultCap),
+			result:      make([]byte, ElmFinderResultCap),
+			maxLoadSize: -1, // No limit to load by default
 		}
 	},
 } // }}}
