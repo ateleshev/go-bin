@@ -1,15 +1,19 @@
-package holder
+package es
+
+/**
+ * es - errors
+ */
 
 import "sync"
 
-func New() Holder { // {{{
-	return &holder{
+func NewErrorList() ErrorList { // {{{
+	return &errorList{
 		mu:  new(sync.Mutex),
 		val: make([]error, 0),
 	}
 } // }}}
 
-type Holder interface {
+type ErrorList interface {
 	Append(error)
 	Value() []error
 	Count() int
@@ -19,43 +23,43 @@ type Holder interface {
 	Reset()
 }
 
-type holder struct {
+type errorList struct {
 	mu  *sync.Mutex
 	val []error
 }
 
-func (this *holder) Append(e error) { // {{{
+func (this *errorList) Append(v error) { // {{{
 	this.mu.Lock()
 	defer this.mu.Unlock()
-	this.val = append(this.val, e)
+	this.val = append(this.val, v)
 } // }}}
 
-func (this *holder) Value() []error { // {{{
+func (this *errorList) Value() []error { // {{{
 	return this.val
 } // }}}
 
-func (this *holder) Count() int { // {{{
+func (this *errorList) Count() int { // {{{
 	return len(this.val)
 } // }}}
 
-func (this *holder) Has() bool { // {{{
+func (this *errorList) Has() bool { // {{{
 	return this.Count() > 0
 } // }}}
 
-func (this *holder) First() error { // {{{
+func (this *errorList) First() error { // {{{
 	if this.Has() {
 		return this.val[0]
 	}
 	return nil
 } // }}}
 
-func (this *holder) Last() error { // {{{
+func (this *errorList) Last() error { // {{{
 	if this.Has() {
 		return this.val[this.Count()-1]
 	}
 	return nil
 } // }}}
 
-func (this *holder) Reset() { // {{{
+func (this *errorList) Reset() { // {{{
 	this.val = this.val[:0]
 } // }}}
