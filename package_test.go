@@ -1,4 +1,4 @@
-package bin
+package bin_test
 
 /**
  * Profiling of test coverage
