@@ -73,6 +73,47 @@ function action_doc_pprof() { # {{{
   render_newline
 } # }}}
 
+function action_doc_gdb() { # {{{
+  render_title "Debugging Go Code with GDB"
+  render_comment "Pass the '-w' flag to the linker to omit the debug information"
+  render_command "go build -ldflags -w prog.go"
+
+  render_subtitle "Getting Started"
+  render_comment "Launch GDB, debugging regexp.test:"
+  render_command "$ gdb regexp.test"
+  render_comment "To help GDB find the Go runtime sources and the accompanying support script, pass your \$GOROOT with the '-d' flag:"
+  render_command "$ gdb regexp.test -d \$GOROOT"
+  render_comment "If for some reason GDB still can't find that directory or that script, you can load it by hand by telling gdb (assuming you have the go sources in ~/go/):"
+  render_command "(gdb) source ~/go/src/runtime/runtime-gdb.py"
+  render_command "Loading Go Runtime support."
+
+  render_subtitle "Inspecting the source"
+  render_comment "Use the 'l' or 'list' command to inspect source code."
+  render_command "(gdb) l"
+  render_comment "List a specific part of the source parametrizing 'list' with a function name (it must be qualified with its package name)."
+  render_command "(gdb) l main.main"
+
+  render_subtitle "Setting breakpoints"
+  render_comment "Set a breakpoint at the TestFind function:"
+  render_command "(gdb) b 'regexp.TestFind'"
+  render_command "Breakpoint 1 at 0x424908: file regexp/find_test.go, line 148."
+  render_comment "Run the program:"
+  render_command "(gdb) run"
+  render_command "Starting program: regexp.test"
+  render_newline
+  render_command "Breakpoint 1, regexp.TestFind (t=0xf8404a89c0) at regexp/find_test.go:148"
+  render_command "148 func TestFind(t *testing.T) {"
+  render_comment "Execution has paused at the breakpoint. See which goroutines are running, and what they're doing:"
+  render_command "(gdb) info goroutines"
+  render_command "  1  waiting runtime.gosched"
+  render_command "* 13  running runtime.goexit"
+  render_comment "the one marked with the * is the current goroutine."
+
+  render_subtitle "Conclusions"
+  render_warning  "GDB does not understand Go programs well."
+  render_link     "Details" "https://golang.org/doc/gdb"
+} # }}}
+
 function action_doc_code() { # {{{
   . "$(dirname "$(realpath "${BASH_SOURCE[0]}")")/doc_code"
 
@@ -84,6 +125,6 @@ function action_doc_code() { # {{{
 } # }}}
 
 function action_doc_help() { # {{{
-  echo "Usage: ${NAME} ${ACTION} {test|cover|bench|pprof|code}"
+  echo "Usage: ${NAME} ${ACTION} {test|cover|bench|pprof|gdb|code}"
 } # }}}
 
