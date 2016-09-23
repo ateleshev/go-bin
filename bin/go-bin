@@ -1,0 +1,81 @@
+#!/usr/bin/env bash
+
+NAME="go-bin"
+PKG="github.com/ateleshev/go-bin"
+
+if [ ! -x "$(which realpath)" ]; then
+  echo "[${NAME}] The 'realpath' is not installed"
+  exit 1
+fi
+
+SCRIPT=$(realpath "${BASH_SOURCE[0]}")
+DIR=$(dirname "${SCRIPT}")
+ACTION=$1
+OPERATION=$2
+
+if [ ! -d "${DIR}/functions" ]; then
+  echo "[${NAME}] Folder '${DIR}/functions' does not exists"
+  exit 1
+fi
+
+if [ ! -f "${DIR}/functions/render" ]; then
+  echo "[${NAME}] File '${DIR}/functions/render' does not exists"
+  exit 1
+fi
+  
+. "${DIR}/functions/render"
+
+function action_gen() { # {{{
+  if [ ! -d "${DIR}/functions/actions" ]; then
+    echo "[${NAME}] Folder '${DIR}/functions/actions' does not exists"
+    exit 1
+  fi
+
+  if [ ! -f "${DIR}/functions/actions/gen" ]; then
+    echo "[${NAME}] File '${DIR}/functions/actions/gen' does not exists"
+    exit 1
+  fi
+
+  . "${DIR}/functions/actions/gen"
+
+  case "${OPERATION}" in
+    cmd)    action_gen_cmd                  ;;
+    cmp)    action_gen_cmp  ${1} ${2} ${3}  ;;
+    pool)   action_gen_pool ${1} ${2} ${3}  ;;
+    test)   action_gen_test ${1} ${2} ${3}  ;;
+    *)      action_gen_help                 ;;
+  esac
+} # }}}
+
+function action_doc() { # {{{
+  if [ ! -d "${DIR}/functions/actions" ]; then
+    echo "[${NAME}] Folder '${DIR}/functions/actions' does not exists"
+    exit 1
+  fi
+
+  if [ ! -f "${DIR}/functions/actions/doc" ]; then
+    echo "[${NAME}] File '${DIR}/functions/actions/doc' does not exists"
+    exit 1
+  fi
+
+  . "${DIR}/functions/actions/doc"
+
+  case "${OPERATION}" in
+    test)   action_doc_test        ;;
+    cover)  action_doc_cover       ;;
+    bench)  action_doc_bench       ;;
+    pprof)  action_doc_pprof       ;;
+    code)   action_doc_code   ${1} ;;
+    *)      action_doc_help        ;;
+  esac
+} # }}}
+
+function action_help() { # {{{
+  echo "Usage: ${NAME} {gen|doc}"
+} # }}}
+
+case "${ACTION}" in
+  gen)    action_gen  ${3} ${4} ${5} ;;
+  doc)    action_doc  ${3} ${4} ${5} ;;
+  *)      action_help                ;;
+esac

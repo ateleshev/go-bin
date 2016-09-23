@@ -1,0 +1,162 @@
+#!/usr/bin/env bash
+
+# --[ generate ]--
+
+function _prepare_cmp() { # {{{
+  CMP_PKG="${1}"
+  CMP_NAME="${2}"
+
+  if [[ "${3}" != "" ]]; then
+    CMP_TYPE=${3}
+  else
+    CMP_TYPE="struct"
+  fi
+
+  case "${CMP_TYPE,,}" in
+    interface)
+      CMP_INSTANCE="${CMP_NAME}{}"
+      CMP_INSTANCE_TYPE="${CMP_NAME}"
+      ;;
+    struct)
+      CMP_INSTANCE="&${CMP_NAME}{}"
+      CMP_INSTANCE_TYPE="*${CMP_NAME}"
+      ;;
+    *)
+      echo "[Error] Unsupported type: ${CMP_TYPE}" 
+      exit 1
+      ;;
+  esac
+
+  POOL_NAME="${CMP_NAME,}Pool"
+  POOL_GET="${POOL_NAME}Get"
+  POOL_PUT="${POOL_NAME}Put"
+} # }}}
+
+function action_gen_cmd() { # {{{
+  render_code "// ${NAME}: ${PKG}
+package main
+
+import (
+)
+
+func init() { // {{{
+} // }}}
+
+func main() { // {{{
+} // }}}
+"
+} # }}}
+
+function action_gen_cmp() { # {{{
+  _prepare_cmp ${1} ${2} ${3}
+
+  render_code "// ${NAME}: ${PKG}
+package ${CMP_PKG}
+
+import (
+)
+
+func New${CMP_NAME}() ${CMP_INSTANCE_TYPE} { // {{{
+  // return ${POOL_GET}()
+  return ${CMP_INSTANCE}
+} // }}}
+
+type ${CMP_NAME} ${CMP_TYPE} {
+}
+
+func (this ${CMP_INSTANCE_TYPE}) Reset() { // {{{
+} // }}}
+
+func (this ${CMP_INSTANCE_TYPE}) Release() { // {{{
+  // ${POOL_PUT}(this)
+} // }}}
+"
+} # }}}
+
+function action_gen_pool() { # {{{
+  _prepare_cmp ${1} ${2} ${3}
+
+  render_code "// ${NAME}: ${PKG}
+package ${CMP_PKG}
+
+import (
+  \"sync\"
+)
+
+var ${POOL_NAME} = sync.Pool{ // {{{
+  New: func() interface{} {
+    return ${CMP_INSTANCE}
+  },
+} // }}}
+
+func ${POOL_GET}() ${CMP_INSTANCE_TYPE} { // {{{
+  if instance := ${POOL_NAME}.Get(); instance != nil {
+    return instance.(${CMP_INSTANCE_TYPE})
+  }
+
+  return ${POOL_NAME}.New().(${CMP_INSTANCE_TYPE})
+} // }}}
+
+func ${POOL_PUT}(instance ${CMP_INSTANCE_TYPE}) { // {{{
+  instance.Reset()
+  ${POOL_NAME}.Put(instance)
+} // }}}
+"
+} # }}}
+
+function action_gen_test() { # {{{
+  CMP_PKG="${1}"
+  CMP_NAME="${2}"
+
+  render_code "// ${NAME}: ${PKG}
+package ${CMP_PKG}_test
+
+import (
+  \"testing\"
+)
+
+var testCasesFor${CMP_NAME} = map[string]string{
+  \"name\": \"value\",
+}
+
+func executeTest${CMP_NAME}(t testing.TB) { // {{{
+  for k, v := range testCasesFor${CMP_NAME} {
+    if k == v {
+      t.Errorf(\"Incorrect value '%s' for key '%s'\", v, k)
+    }
+  }
+} // }}}
+
+// ==[ Tests ]==
+
+func Test${CMP_NAME}(t *testing.T) { // {{{
+  executeTest${CMP_NAME}(t)
+} // }}}
+
+// ==[ Benchmarks ]==
+
+func Benchmark${CMP_NAME}(b *testing.B) { // {{{
+  for i := 0; i < b.N; i++ {
+    executeTest${CMP_NAME}(b)
+  }
+} // }}}
+
+"
+} # }}}
+
+function action_gen_help() { # {{{
+  render_title "Generate"
+  render_comment "Command"
+  render_command "${NAME} ${ACTION} cmd"
+  render_comment "Component"
+  render_command "${NAME} ${ACTION} cmp  <package> <name> [<type> = struct]"
+  render_comment "Pool for component"
+  render_command "${NAME} ${ACTION} pool <package> <name> [<type> = struct]"
+  render_comment "Test for component"
+  render_command "${NAME} ${ACTION} test <package> <name> [<type> = struct]"
+  render_subtitle "Usage"
+  render_command "${NAME} ${ACTION} {cmd|cmp|pool|test} ..."
+  render_newline
+} # }}}
+
+# --[ /generate ]--
