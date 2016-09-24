@@ -120,6 +120,7 @@ function action_doc_code() { # {{{
   case "${1}" in
     recover)   action_code_recover  ;;
     timeout)   action_code_timeout  ;;
+    reflect)   action_code_reflect  ;;
     *)         action_code_help     ;;
   esac
 } # }}}

@@ -8,15 +8,15 @@ package main
 
 import \"fmt\"
 
-func main() {
+func main() { // {{{
   var err error
   err = f(1)
   fmt.Println(\"f(1) - done: error =\", err)
   err = f(0)
   fmt.Println(\"f(0) - done: error =\", err)
-}
+} // }}}
 
-func f(i int) (err error) {
+func f(i int) (err error) { // {{{
   defer func() {
     if r := recover(); r != nil {
       err = fmt.Errorf(\"panic: %v\", r)
@@ -24,13 +24,13 @@ func f(i int) (err error) {
   }()
   g(i)
   return
-}
+} // }}}
 
-func g(i int) {
+func g(i int) { // {{{
   if i == 0 {
     panic(\"i - cannot be zero\")
   }
-}"
+} // }}}"
 } # }}}
 
 function action_code_timeout() { # {{{
@@ -41,12 +41,12 @@ import \"fmt\"
 import \"time\"
 import \"sync\"
 
-func main() {
+func main() { // {{{
   f(1, 2, 1)
   f(2, 1, 1)
-}
+} // }}}
 
-func f(i, j, k int) {
+func f(i, j, k int) { // {{{
   var n int
   var wg sync.WaitGroup
   done := make(chan int, 3)
@@ -82,12 +82,84 @@ func f(i, j, k int) {
       }
     }
   }
-}"
+} // }}}"
+} # }}}
+
+function action_code_reflect() { # {{{
+  render_code "// Reflect: https://golang.org/pkg/reflect
+package main
+
+import \"errors\"
+import \"fmt\"
+import \"reflect\"
+import \"unsafe\"
+
+type Foo struct {
+  X int8  \`name:\"first\"\`
+  y int16 \`name:\"next\"\`
+  z int32 \`name:\"last\"\`
+}
+
+func handleError(err error) { // {{{
+  if err != nil {
+    fmt.Printf(\"[Error] %s\n\", err)
+  }
+} // }}}
+
+func changeValue(v interface{}) { // {{{
+  switch v := v.(type) {
+  case *int8:
+    *v = 100
+    break
+  }
+} // }}}
+
+func changeField(i interface{}, n string) (err error) { // {{{
+  v := reflect.ValueOf(i).Elem().FieldByName(n)
+  if v.CanSet() {
+    changeValue(v.Addr().Interface())
+  } else {
+    err = errors.New(\"Cannot change field: \" + n)
+  }
+  return
+} // }}}
+
+func main() { // {{{
+  foo := &Foo{1, 2, 3}
+  fmt.Println(\"Foo =\", foo)
+  val := reflect.ValueOf(foo)
+  elm := val.Elem()
+
+  fmt.Println(\"reflect.ValueOf(Foo).Kind(): \", val.Kind())
+  fmt.Println(\"reflect.ValueOf(Foo).Elem().Kind(): \", elm.Kind())
+  fmt.Println(\"reflect.Indirect(reflect.ValueOf(Foo)).Kind(): \", reflect.Indirect(val).Kind())
+  fmt.Println(\"reflect.Indirect(reflect.ValueOf(Foo).Elem()).Kind(): \", reflect.Indirect(elm).Kind())
+
+  fmt.Println(\"Can set Foo.X =\", elm.FieldByName(\"X\").CanSet())
+  fmt.Println(\"Can set Foo.y =\", elm.FieldByName(\"y\").CanSet())
+  fmt.Println(\"Can set Foo.z =\", elm.FieldByName(\"z\").CanSet())
+
+  handleError(changeField(foo, \"X\"))
+  handleError(changeField(foo, \"y\"))
+  handleError(changeField(foo, \"z\"))
+
+  fmt.Println(\"Foo =\", foo)
+
+  elemType := elm.Type()
+  var i int
+  for i < elemType.NumField() {
+    field := elemType.Field(i)
+    fmt.Printf(\"(%s)(%s.%s) Tag[name] = %s\n\", field.Type, elemType.Name(), field.Name, field.Tag.Get(\"name\"))
+    i++
+  }
+
+  var u uintptr = 18446744073709551615 // uintptr size for 64-bit = 8, 32-bit = 4
+  fmt.Println(\"uintptr size:\", unsafe.Sizeof(u), \"(bytes) for:\", u)
+} // }}}"
 } # }}}
 
 function action_code_help() { # {{{
-  echo "Usage: ${NAME} ${ACTION} ${OPERATION} {recover|timeout}"
+  echo "Usage: ${NAME} ${ACTION} ${OPERATION} {recover|timeout|reflect}"
 } # }}}
 
 # --[ /code ]--
-
