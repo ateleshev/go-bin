@@ -143,23 +143,28 @@ func main() { // {{{
   handleError(changeField(foo, \"y\"))
   handleError(changeField(foo, \"z\"))
 
-  fmt.Println(\"Foo =\", foo)
-
+  fooCopy := &Foo{100, 2, 3}
+  fmt.Printf(\"Foo=%v,Copy=%v,IsEqual=%t\n\", foo, fooCopy, reflect.DeepEqual(foo, fooCopy))
   elemType := elm.Type()
-  var i int
-  for i < elemType.NumField() {
+  for i:=0; i < elemType.NumField(); i++ {
     field := elemType.Field(i)
     fmt.Printf(\"(%s)(%s.%s) Tag[name] = %s\n\", field.Type, elemType.Name(), field.Name, field.Tag.Get(\"name\"))
-    i++
   }
-
-  var u uintptr = 18446744073709551615 // uintptr size for 64-bit = 8, 32-bit = 4
-  fmt.Println(\"uintptr size:\", unsafe.Sizeof(u), \"(bytes) for:\", u)
+  fmt.Printf(\"uintptr(18446744073709551615) size = %d (bytes)\n\", unsafe.Sizeof(uintptr(18446744073709551615))) // uintptr size for 64-bit = 8, 32-bit = 4
 } // }}}"
 } # }}}
 
 function action_code_help() { # {{{
-  echo "Usage: ${NAME} ${ACTION} ${OPERATION} {recover|timeout|reflect}"
+  render_usage "${NAME} ${ACTION} ${OPERATION} {recover|timeout|reflect}"
+  render_subtitle "Recover"
+  render_code "go-bin doc code recover > recover.go"
+  render_code "go run recover.go"
+  render_subtitle "Timeout"
+  render_code "go-bin doc code timeout > timeout.go"
+  render_code "go run timeout.go"
+  render_subtitle "Recover"
+  render_code "go-bin doc code reflect > reflect.go"
+  render_code "go run reflect.go"
 } # }}}
 
 # --[ /code ]--

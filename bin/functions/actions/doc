@@ -126,6 +126,6 @@ function action_doc_code() { # {{{
 } # }}}
 
 function action_doc_help() { # {{{
-  echo "Usage: ${NAME} ${ACTION} {test|cover|bench|pprof|gdb|code}"
+  render_usage "${NAME} ${ACTION} {test|cover|bench|pprof|gdb|code}"
 } # }}}
 

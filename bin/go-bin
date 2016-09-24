@@ -72,7 +72,7 @@ function action_doc() { # {{{
 } # }}}
 
 function action_help() { # {{{
-  echo "Usage: ${NAME} {gen|doc}"
+  render_usage "${NAME} {gen|doc}"
 } # }}}
 
 case "${ACTION}" in

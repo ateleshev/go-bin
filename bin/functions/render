@@ -4,6 +4,14 @@ case "$TERM" in
   xterm*|rxvt*|screen*) color_prompt=yes ;;
 esac
 
+function render_usage() { # {{{
+  if [ "$color_prompt" = yes ]; then
+    echo -e "\e[96mUsage\e[39m: \e[1m${1}\e[22m"
+  else
+    echo "Usage: ${1}"
+  fi
+} # }}}
+
 function render_title() { # {{{
   render_newline
   if [ "$color_prompt" = yes ]; then

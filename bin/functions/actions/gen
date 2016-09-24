@@ -145,18 +145,16 @@ func Benchmark${CMP_NAME}(b *testing.B) { // {{{
 } # }}}
 
 function action_gen_help() { # {{{
-  render_title "Generate"
-  render_comment "Command"
+  render_usage "${NAME} ${ACTION} {cmd|cmp|pool|test} ..."
+
+  render_subtitle "Command"
   render_command "${NAME} ${ACTION} cmd"
-  render_comment "Component"
+  render_subtitle "Component"
   render_command "${NAME} ${ACTION} cmp  <package> <name> [<type> = struct]"
-  render_comment "Pool for component"
+  render_subtitle "Pool for component"
   render_command "${NAME} ${ACTION} pool <package> <name> [<type> = struct]"
-  render_comment "Test for component"
+  render_subtitle "Test for component"
   render_command "${NAME} ${ACTION} test <package> <name> [<type> = struct]"
-  render_subtitle "Usage"
-  render_command "${NAME} ${ACTION} {cmd|cmp|pool|test} ..."
-  render_newline
 } # }}}
 
 # --[ /generate ]--
