@@ -1,4 +1,4 @@
-package data
+package cmp
 
 type Getter interface {
 	Get(key string, value interface{}) error

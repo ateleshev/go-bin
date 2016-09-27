@@ -1,4 +1,4 @@
-package data
+package cmp
 
 type Sender interface {
 	Send(v interface{}) error
