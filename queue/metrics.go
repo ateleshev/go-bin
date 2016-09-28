@@ -1,7 +1,7 @@
 package queue
 
 import "time"
-import "binary"
+import "encoding/binary"
 
 type Metrics interface {
 	Executor() string
@@ -14,7 +14,7 @@ type Metrics interface {
 	MemoryUsage() int
 }
 
-func NewMetrics(executor string) metrics { // {{{
+func NewMetrics(executor string) Metrics { // {{{
 	m := metricsPoolGet()
 	m.executor = executor
 	m.beginTime = time.Now()

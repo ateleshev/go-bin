@@ -15,9 +15,10 @@ type Results interface {
 	Metrics() Metrics
 }
 
-func Newresults(id int, creator Creator) results { // {{{
+func NewResults(id int, creator Creator) Results { // {{{
 	return &results{
-		id: id,
+		id:      id,
+		creator: creator,
 	}
 } // }}}
 
@@ -58,5 +59,8 @@ func (this *results) Init(executor string) { // {{{
 func (this *results) Bind(value interface{}, err error) { // {{{
 	this.err = err
 	this.value = value
-	this.metrics.Calculate(value)
+
+	if this.metrics != nil {
+		this.metrics.Calculate(value)
+	}
 } // }}}
