@@ -13,6 +13,9 @@ type Results interface {
 	Bind(interface{}, error)
 
 	Metrics() Metrics
+
+	Reset()
+	Release()
 }
 
 func NewResults(id int, creator Creator) Results { // {{{
@@ -63,4 +66,16 @@ func (this *results) Bind(value interface{}, err error) { // {{{
 	if this.metrics != nil {
 		this.metrics.Calculate(value)
 	}
+} // }}}
+
+func (this *results) Reset() { // {{{
+	this.id = 0
+	this.creator = nil
+	this.err = nil
+	this.value = nil
+	this.metrics = nil
+} // }}}
+
+func (this *results) Release() { // {{{
+	resultsPoolPut(this)
 } // }}}
