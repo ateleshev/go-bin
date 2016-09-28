@@ -5,7 +5,7 @@ type Sender interface {
 }
 
 type Receiver interface {
-	Receiv() (interface{}, error)
+	Receive() (interface{}, error)
 }
 
 type Communicator interface {
