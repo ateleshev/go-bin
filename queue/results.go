@@ -1,49 +1,61 @@
 package queue
 
+type Creator func() interface{}
+
 type Results interface {
 	Id() int
+	Create() interface{}
+
 	Err() error
 	Value() interface{}
-	Metrics() Metrics
 
 	Init(string)
 	Bind(interface{}, error)
+
+	Metrics() Metrics
 }
 
-func NewResult(id int) Result { // {{{
-	return &result{
+func Newresults(id int, creator Creator) results { // {{{
+	return &results{
 		id: id,
 	}
 } // }}}
 
-type result struct {
+type results struct {
 	id      int
-	err     error
-	value   interface{}
+	creator Creator
+
+	err   error
+	value interface{}
+
 	metrics Metrics
 }
 
-func (this *result) Id() int { // {{{
+func (this *results) Id() int { // {{{
 	return this.id
 } // }}}
 
-func (this *result) Err() error { // {{{
+func (this *results) Create() interface{} { // {{{
+	return this.creator()
+} // }}}
+
+func (this *results) Err() error { // {{{
 	return this.err
 } // }}}
 
-func (this *result) Value() interface{} { // {{{
+func (this *results) Value() interface{} { // {{{
 	return this.value
 } // }}}
 
-func (this *result) Metrics() Metrics { // {{{
+func (this *results) Metrics() Metrics { // {{{
 	return this.metrics
 } // }}}
 
-func (this *result) Init(executor string) { // {{{
+func (this *results) Init(executor string) { // {{{
 	this.metrics = NewMetrics(executor)
 } // }}}
 
-func (this *result) Bind(value interface{}, err error) { // {{{
+func (this *results) Bind(value interface{}, err error) { // {{{
 	this.err = err
 	this.value = value
 	this.metrics.Calculate(value)
