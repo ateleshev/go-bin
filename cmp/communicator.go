@@ -1,7 +1,7 @@
 package cmp
 
 type Sender interface {
-	Send(v interface{}) error
+	Send(interface{}) error
 }
 
 type Receiver interface {
