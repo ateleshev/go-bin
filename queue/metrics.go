@@ -1,7 +1,7 @@
 package queue
 
 import "time"
-import "encoding/binary"
+import "unsafe"
 
 type Metrics interface {
 	Executor() string
@@ -11,7 +11,7 @@ type Metrics interface {
 	Calculate(interface{})
 
 	ElapsedTime() time.Duration
-	MemoryUsage() int
+	MemoryUsage() uintptr
 }
 
 func NewMetrics(executor string) Metrics { // {{{
@@ -25,7 +25,7 @@ type metrics struct {
 	executor    string
 	beginTime   time.Time
 	finishTime  time.Time
-	memoryUsage int
+	memoryUsage uintptr
 }
 
 func (this *metrics) Reset() { // {{{
@@ -53,13 +53,13 @@ func (this *metrics) FinishTime() time.Time { // {{{
 
 func (this *metrics) Calculate(v interface{}) { // {{{
 	this.finishTime = time.Now()
-	this.memoryUsage = binary.Size(v)
+	this.memoryUsage = unsafe.Sizeof(v)
 } // }}}
 
 func (this *metrics) ElapsedTime() time.Duration { // {{{
 	return this.finishTime.Sub(this.beginTime)
 } // }}}
 
-func (this *metrics) MemoryUsage() int { // {{{
+func (this *metrics) MemoryUsage() uintptr { // {{{
 	return this.memoryUsage
 } // }}}
