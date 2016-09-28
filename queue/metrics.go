@@ -30,8 +30,8 @@ type metrics struct {
 
 func (this *metrics) Reset() { // {{{
 	this.executor = ""
-	this.beginTime = (time.Time)(nil)
-	this.finishTime = (time.Time)(nil)
+	this.beginTime = time.Time{}
+	this.finishTime = time.Time{}
 	this.memoryUsage = 0
 } // }}}
 
@@ -57,7 +57,7 @@ func (this *metrics) Calculate(v interface{}) { // {{{
 } // }}}
 
 func (this *metrics) ElapsedTime() time.Duration { // {{{
-	return this.endTime.Sub(this.beginTime)
+	return this.finishTime.Sub(this.beginTime)
 } // }}}
 
 func (this *metrics) MemoryUsage() int { // {{{
