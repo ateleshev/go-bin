@@ -8,6 +8,7 @@ type Metric interface {
 	BeginTime() time.Time
 	FinishTime() time.Time
 
+	Init()
 	Calculate(interface{})
 
 	ElapsedTime() time.Duration
@@ -20,7 +21,7 @@ type Metric interface {
 func NewMetric(executor string) Metric { // {{{
 	m := metricPoolGet()
 	m.executor = executor
-	m.beginTime = time.Now()
+	m.Init()
 	return m
 } // }}}
 
@@ -52,6 +53,10 @@ func (this *metric) BeginTime() time.Time { // {{{
 
 func (this *metric) FinishTime() time.Time { // {{{
 	return this.finishTime
+} // }}}
+
+func (this *metric) Init() { // {{{
+	m.beginTime = time.Now()
 } // }}}
 
 func (this *metric) Calculate(v interface{}) { // {{{
