@@ -57,6 +57,7 @@ func (this *result) Metric() Metric { // {{{
 
 func (this *result) Init(executor string) { // {{{
 	this.metric = NewMetric(executor)
+	this.metric.Begin()
 } // }}}
 
 func (this *result) Bind(value interface{}, err error) { // {{{
@@ -64,7 +65,7 @@ func (this *result) Bind(value interface{}, err error) { // {{{
 	this.value = value
 
 	if this.metric != nil {
-		this.metric.Calculate(value)
+		this.metric.Finish()
 	}
 } // }}}
 
