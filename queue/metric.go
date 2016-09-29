@@ -56,7 +56,7 @@ func (this *metric) FinishTime() time.Time { // {{{
 } // }}}
 
 func (this *metric) Init() { // {{{
-	m.beginTime = time.Now()
+	this.beginTime = time.Now()
 } // }}}
 
 func (this *metric) Calculate(v interface{}) { // {{{
