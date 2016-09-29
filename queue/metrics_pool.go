@@ -1,25 +1,23 @@
 // go-bin: github.com/ateleshev/go-bin
 package queue
 
-import (
-	"sync"
-)
+import "sync"
 
-var metricsPool = sync.Pool{ // {{{
+var metricPool = sync.Pool{ // {{{
 	New: func() interface{} {
-		return &metrics{}
+		return &metric{}
 	},
 } // }}}
 
-func metricsPoolGet() *metrics { // {{{
-	if instance := metricsPool.Get(); instance != nil {
-		return instance.(*metrics)
+func metricPoolGet() *metric { // {{{
+	if instance := metricPool.Get(); instance != nil {
+		return instance.(*metric)
 	}
 
-	return metricsPool.New().(*metrics)
+	return metricPool.New().(*metric)
 } // }}}
 
-func metricsPoolPut(instance *metrics) { // {{{
+func metricPoolPut(instance *metric) { // {{{
 	instance.Reset()
-	metricsPool.Put(instance)
+	metricPool.Put(instance)
 } // }}}

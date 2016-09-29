@@ -2,7 +2,7 @@ package queue
 
 type Creator func() interface{}
 
-type Results interface {
+type Result interface {
 	Id() int
 	Create() interface{}
 
@@ -12,70 +12,70 @@ type Results interface {
 	Init(string)
 	Bind(interface{}, error)
 
-	Metrics() Metrics
+	Metric() Metric
 
 	Reset()
 	Release()
 }
 
-func NewResults(id int, creator Creator) Results { // {{{
-	return &results{
+func NewResult(id int, creator Creator) Result { // {{{
+	return &result{
 		id:      id,
 		creator: creator,
 	}
 } // }}}
 
-type results struct {
+type result struct {
 	id      int
 	creator Creator
 
 	err   error
 	value interface{}
 
-	metrics Metrics
+	metric Metric
 }
 
-func (this *results) Id() int { // {{{
+func (this *result) Id() int { // {{{
 	return this.id
 } // }}}
 
-func (this *results) Create() interface{} { // {{{
+func (this *result) Create() interface{} { // {{{
 	return this.creator()
 } // }}}
 
-func (this *results) Err() error { // {{{
+func (this *result) Err() error { // {{{
 	return this.err
 } // }}}
 
-func (this *results) Value() interface{} { // {{{
+func (this *result) Value() interface{} { // {{{
 	return this.value
 } // }}}
 
-func (this *results) Metrics() Metrics { // {{{
-	return this.metrics
+func (this *result) Metric() Metric { // {{{
+	return this.metric
 } // }}}
 
-func (this *results) Init(executor string) { // {{{
-	this.metrics = NewMetrics(executor)
+func (this *result) Init(executor string) { // {{{
+	this.metric = NewMetric(executor)
 } // }}}
 
-func (this *results) Bind(value interface{}, err error) { // {{{
+func (this *result) Bind(value interface{}, err error) { // {{{
 	this.err = err
 	this.value = value
 
-	if this.metrics != nil {
-		this.metrics.Calculate(value)
+	if this.metric != nil {
+		this.metric.Calculate(value)
 	}
 } // }}}
 
-func (this *results) Reset() { // {{{
+func (this *result) Reset() { // {{{
 	this.id = 0
 	this.creator = nil
 	this.err = nil
 	this.value = nil
-	this.metrics = nil
+	this.metric = nil
 } // }}}
 
-func (this *results) Release() { // {{{
-	resultsPoolPut(this)
+func (this *result) Release() { // {{{
+	resultPoolPut(this)
 } // }}}

@@ -3,7 +3,7 @@ package queue
 import "time"
 import "unsafe"
 
-type Metrics interface {
+type Metric interface {
 	Executor() string
 	BeginTime() time.Time
 	FinishTime() time.Time
@@ -14,52 +14,52 @@ type Metrics interface {
 	MemoryUsage() uintptr
 }
 
-func NewMetrics(executor string) Metrics { // {{{
-	m := metricsPoolGet()
+func NewMetric(executor string) Metric { // {{{
+	m := metricPoolGet()
 	m.executor = executor
 	m.beginTime = time.Now()
 	return m
 } // }}}
 
-type metrics struct {
+type metric struct {
 	executor    string
 	beginTime   time.Time
 	finishTime  time.Time
 	memoryUsage uintptr
 }
 
-func (this *metrics) Reset() { // {{{
+func (this *metric) Reset() { // {{{
 	this.executor = ""
 	this.beginTime = time.Time{}
 	this.finishTime = time.Time{}
 	this.memoryUsage = 0
 } // }}}
 
-func (this *metrics) Release() { // {{{
-	metricsPoolPut(this)
+func (this *metric) Release() { // {{{
+	metricPoolPut(this)
 } // }}}
 
-func (this *metrics) Executor() string { // {{{
+func (this *metric) Executor() string { // {{{
 	return this.executor
 } // }}}
 
-func (this *metrics) BeginTime() time.Time { // {{{
+func (this *metric) BeginTime() time.Time { // {{{
 	return this.beginTime
 } // }}}
 
-func (this *metrics) FinishTime() time.Time { // {{{
+func (this *metric) FinishTime() time.Time { // {{{
 	return this.finishTime
 } // }}}
 
-func (this *metrics) Calculate(v interface{}) { // {{{
+func (this *metric) Calculate(v interface{}) { // {{{
 	this.finishTime = time.Now()
 	this.memoryUsage = unsafe.Sizeof(v)
 } // }}}
 
-func (this *metrics) ElapsedTime() time.Duration { // {{{
+func (this *metric) ElapsedTime() time.Duration { // {{{
 	return this.finishTime.Sub(this.beginTime)
 } // }}}
 
-func (this *metrics) MemoryUsage() uintptr { // {{{
+func (this *metric) MemoryUsage() uintptr { // {{{
 	return this.memoryUsage
 } // }}}

@@ -1,25 +1,23 @@
 // go-bin: github.com/ateleshev/go-bin
 package queue
 
-import (
-	"sync"
-)
+import "sync"
 
-var resultsPool = sync.Pool{ // {{{
+var resultPool = sync.Pool{ // {{{
 	New: func() interface{} {
-		return &results{}
+		return &result{}
 	},
 } // }}}
 
-func resultsPoolGet() *results { // {{{
-	if instance := resultsPool.Get(); instance != nil {
-		return instance.(*results)
+func resultPoolGet() *result { // {{{
+	if instance := resultPool.Get(); instance != nil {
+		return instance.(*result)
 	}
 
-	return resultsPool.New().(*results)
+	return resultPool.New().(*result)
 } // }}}
 
-func resultsPoolPut(instance *results) { // {{{
+func resultPoolPut(instance *result) { // {{{
 	instance.Reset()
-	resultsPool.Put(instance)
+	resultPool.Put(instance)
 } // }}}
