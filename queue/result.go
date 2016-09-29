@@ -1,24 +1,21 @@
 package queue
 
-type Creator func() interface{}
+import "github.com/ateleshev/go-bin/cmp"
 
 type Result interface {
 	Id() int
-	Create() interface{}
-
 	Err() error
 	Value() interface{}
 
 	Init(string)
 	Bind(interface{}, error)
-
+	Create() interface{}
 	Metric() Metric
 
-	Reset()
-	Release()
+	cmp.ResetReleaser
 }
 
-func NewResult(id int, creator Creator) Result { // {{{
+func NewResult(id int, creator cmp.Creator) Result { // {{{
 	return &result{
 		id:      id,
 		creator: creator,
@@ -27,12 +24,10 @@ func NewResult(id int, creator Creator) Result { // {{{
 
 type result struct {
 	id      int
-	creator Creator
-
-	err   error
-	value interface{}
-
-	metric Metric
+	err     error
+	value   interface{}
+	metric  Metric
+	creator cmp.Creator
 }
 
 func (this *result) Id() int { // {{{
@@ -40,7 +35,7 @@ func (this *result) Id() int { // {{{
 } // }}}
 
 func (this *result) Create() interface{} { // {{{
-	return this.creator()
+	return this.creator.Create()
 } // }}}
 
 func (this *result) Err() error { // {{{
@@ -55,8 +50,8 @@ func (this *result) Metric() Metric { // {{{
 	return this.metric
 } // }}}
 
-func (this *result) Init(executor string) { // {{{
-	this.metric = NewMetric(executor)
+func (this *result) Init(name string) { // {{{
+	this.metric = NewMetric(name)
 	this.metric.Begin()
 } // }}}
 
@@ -71,10 +66,10 @@ func (this *result) Bind(value interface{}, err error) { // {{{
 
 func (this *result) Reset() { // {{{
 	this.id = 0
-	this.creator = nil
 	this.err = nil
 	this.value = nil
 	this.metric = nil
+	this.creator = nil
 } // }}}
 
 func (this *result) Release() { // {{{

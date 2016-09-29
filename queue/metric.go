@@ -1,9 +1,10 @@
 package queue
 
 import "time"
+import "github.com/ateleshev/go-bin/cmp"
 
 type Metric interface {
-	Executor() string
+	Name() string
 	BeginTime() time.Time
 	FinishTime() time.Time
 	ElapsedTime() time.Duration
@@ -11,34 +12,33 @@ type Metric interface {
 	Begin()
 	Finish()
 
-	Reset()
-	Release()
+	cmp.ResetReleaser
 }
 
-func NewMetric(executor string) Metric { // {{{
+func NewMetric(name string) Metric { // {{{
 	m := metricPoolGet()
-	m.executor = executor
+	m.name = name
 	return m
 } // }}}
 
 type metric struct {
-	executor   string
+	name       string
 	beginTime  time.Time
 	finishTime time.Time
 }
 
 func (this *metric) Reset() { // {{{
-	this.executor = ""
-	this.beginTime = time.Time{}
-	this.finishTime = time.Time{}
+	this.name = ""
+	//	this.beginTime = time.Time{}
+	//	this.finishTime = time.Time{}
 } // }}}
 
 func (this *metric) Release() { // {{{
 	metricPoolPut(this)
 } // }}}
 
-func (this *metric) Executor() string { // {{{
-	return this.executor
+func (this *metric) Name() string { // {{{
+	return this.name
 } // }}}
 
 func (this *metric) BeginTime() time.Time { // {{{
