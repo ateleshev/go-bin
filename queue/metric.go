@@ -12,6 +12,9 @@ type Metric interface {
 
 	ElapsedTime() time.Duration
 	MemoryUsage() uintptr
+
+	Reset()
+	Release()
 }
 
 func NewMetric(executor string) Metric { // {{{
