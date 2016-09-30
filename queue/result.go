@@ -56,8 +56,11 @@ func (this *result) Init(name string) { // {{{
 } // }}}
 
 func (this *result) Bind(value interface{}, err error) { // {{{
-	this.err = err
-	this.value = value
+	if err != nil {
+		this.err = err
+	} else {
+		this.value = value
+	}
 
 	if this.metric != nil {
 		this.metric.Finish()
