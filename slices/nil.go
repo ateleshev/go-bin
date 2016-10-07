@@ -3,31 +3,41 @@ package slices
 
 import "reflect"
 
-// Check value is nil
-func isNil(v interface{}) bool {
-	return v == nil || reflect.ValueOf(v).IsNil()
-}
-
 // Move the nil to down of slice
-func NilDown(data []interface{}) (l int) {
+func sortNilInEnd(slice reflect.Value) (n int) {
 	// Find non nil at the end of
-	i := len(data)
+	i := slice.Len()
 	for i > 0 {
-		if !isNil(data[i-1]) {
+		if !slice.Index(i - 1).IsNil() {
 			break
 		}
 		i--
 	}
 
-	l = i // new len of slice
+	n = i // new len of slice
 	i--
 	for i >= 0 {
-		if isNil(data[i]) {
-			data[i] = data[l-1]
-			l--
+		current := slice.Index(i)
+		if current.IsNil() {
+			last := slice.Index(n - 1)
+			current.Set(last)
+			last.Set(reflect.Zero(current.Type()))
+			n--
 		}
 		i--
 	}
 
+	return
+}
+
+// n - index of first element of nil
+func SortNilInEnd(s interface{}) (n int, err error) {
+	v := reflect.ValueOf(s)
+	if v.Kind() != reflect.Slice {
+		err = ErrItIsNotSlice
+		return
+	}
+
+	n = sortNilInEnd(v)
 	return
 }

@@ -24,9 +24,15 @@ func TestClear(t *testing.T) {
 		{[]interface{}{&time.Time{}, &time.Time{}}, []interface{}{&time.Time{}, &time.Time{}}},
 	}
 	for _, c := range cases {
-		in := fmt.Sprintf("%q", c.in)
-		if !reflect.DeepEqual(Clear(c.in), c.want) {
-			t.Errorf("Clear(%s) != %q", in, c.want)
+		input := fmt.Sprintf("%q", c.in)
+		res, err := Clear(c.in)
+
+		if err != nil {
+			t.Fatalf("Clear(%s) Error: %v", input, err)
+		}
+
+		if !reflect.DeepEqual(res.([]interface{}), c.want) {
+			t.Errorf("Clear(%s) != %q", input, c.want)
 		}
 	}
 }
@@ -36,8 +42,27 @@ func TestClear(t *testing.T) {
  */
 
 func BenchmarkClear(b *testing.B) {
-	sl := []interface{}{nil, &time.Time{}, &time.Time{}, nil, &time.Time{}, nil, nil}
+	var err error
+	s := []interface{}{nil, &time.Time{}, &time.Time{}, nil, &time.Time{}, nil, nil}
+	input := fmt.Sprintf("%q", s)
+
+	b.ReportAllocs()
+	b.ResetTimer()
+
 	for i := 0; i < b.N; i++ {
-		Clear(sl)
+		_, err = Clear(s)
+		if err != nil {
+			b.Fatalf("Clear(%s) Error: %v", input, err)
+		}
 	}
+}
+
+func ExampleClear() {
+	s := []interface{}{&time.Time{}, nil, nil}
+	r, err := Clear(s)
+	if err == nil {
+		fmt.Println(r.([]interface{}))
+	}
+	// Output:
+	// [0001-01-01 00:00:00 +0000 UTC]
 }
