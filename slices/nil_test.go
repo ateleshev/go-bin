@@ -1,4 +1,3 @@
-// Package slices provides primitives for working with slices
 package slices
 
 import (
@@ -39,7 +38,7 @@ func TestSortNilInEnd(t *testing.T) {
 }
 
 /**
- * go test -v -run=^$ -benchmem -bench=.
+ * go test -v -run=^$ -bench=.
  */
 
 func BenchmarkSortNilInEnd(b *testing.B) {

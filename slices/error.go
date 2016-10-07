@@ -1,4 +1,3 @@
-// Package slices provides primitives for working with slices
 package slices
 
 type Error string
