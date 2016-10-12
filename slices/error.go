@@ -1,9 +1,7 @@
 package slices
 
-type Error string
-
-func (e Error) Error() string { return string(e) }
+import "github.com/ateleshev/go-bin/errutil"
 
 const (
-	ErrItIsNotSlice = Error("It is not slice")
+	ErrItIsNotSlice = errutil.Error("It is not slice")
 )
