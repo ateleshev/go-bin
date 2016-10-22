@@ -8,7 +8,8 @@ type Logger interface {
 	Open() error
 	Close() error
 
-	AccessLogger
+	PanicLogger
 	ErrorLogger
 	DebugLogger
+	AccessLogger
 }

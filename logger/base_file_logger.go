@@ -1,6 +1,7 @@
 package logger
 
 import (
+	"fmt"
 	"log"
 )
 
@@ -42,16 +43,12 @@ func (this *baseFileLogger) Reset() { // {{{
 	delete(this.loggers, ModeDebug)
 } // }}}
 
-func (this *baseFileLogger) Access(v ...interface{}) { // {{{
-	if this.loggers[ModeAccess] != nil {
-		this.loggers[ModeAccess].Print(v...)
-	}
+func (this *baseFileLogger) Panic(v ...interface{}) { // {{{
+	panic(fmt.Sprint(v...))
 } // }}}
 
-func (this *baseFileLogger) Accessf(f string, v ...interface{}) { // {{{
-	if this.loggers[ModeAccess] != nil {
-		this.loggers[ModeAccess].Printf(f, v...)
-	}
+func (this *baseFileLogger) Panicf(f string, v ...interface{}) { // {{{
+	panic(fmt.Sprintf(f, v...))
 } // }}}
 
 func (this *baseFileLogger) Error(v ...interface{}) { // {{{
@@ -75,5 +72,17 @@ func (this *baseFileLogger) Debug(v ...interface{}) { // {{{
 func (this *baseFileLogger) Debugf(f string, v ...interface{}) { // {{{
 	if this.loggers[ModeDebug] != nil {
 		this.loggers[ModeDebug].Printf(f, v...)
+	}
+} // }}}
+
+func (this *baseFileLogger) Access(v ...interface{}) { // {{{
+	if this.loggers[ModeAccess] != nil {
+		this.loggers[ModeAccess].Print(v...)
+	}
+} // }}}
+
+func (this *baseFileLogger) Accessf(f string, v ...interface{}) { // {{{
+	if this.loggers[ModeAccess] != nil {
+		this.loggers[ModeAccess].Printf(f, v...)
 	}
 } // }}}
