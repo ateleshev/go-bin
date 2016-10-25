@@ -3,7 +3,6 @@ package logger
 import (
 	"log"
 	"os"
-	"strings"
 )
 
 // One file logger
@@ -34,15 +33,15 @@ func (this *fileLogger) Open() (err error) { // {{{
 
 	// Access
 	if this.mode&(ModeAccess) != 0 {
-		this.register(ModeAccess, log.New(this.file, strings.ToUpper(ModeName[ModeAccess])+": ", log.LstdFlags))
+		this.register(ModeAccess, log.New(this.file, DefaultPrefixBuilder(ModeAccess), log.LstdFlags))
 	}
 	// Error
 	if this.mode&(ModeError) != 0 {
-		this.register(ModeError, log.New(this.file, strings.ToUpper(ModeName[ModeError])+": ", log.LstdFlags))
+		this.register(ModeError, log.New(this.file, DefaultPrefixBuilder(ModeError), log.LstdFlags))
 	}
 	// Debug
 	if this.mode&(ModeDebug) != 0 {
-		this.register(ModeDebug, log.New(this.file, strings.ToUpper(ModeName[ModeDebug])+": ", log.LstdFlags))
+		this.register(ModeDebug, log.New(this.file, DefaultPrefixBuilder(ModeDebug), log.LstdFlags))
 	}
 
 	return

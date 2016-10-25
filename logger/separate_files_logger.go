@@ -3,7 +3,6 @@ package logger
 import (
 	"log"
 	"os"
-	"strings"
 )
 
 // Use separate files to write logs by mode
@@ -39,21 +38,21 @@ func (this *separateFilesLogger) Open() (err error) { // {{{
 		if this.files[ModeAccess], err = os.OpenFile(DefaultFilenameForModeBuilder(this.path, this.name, ModeAccess), DefaultFileFlag, DefaultFilePerm); err != nil {
 			return
 		}
-		this.register(ModeAccess, log.New(this.files[ModeAccess], strings.ToUpper(ModeName[ModeAccess])+": ", log.LstdFlags))
+		this.register(ModeAccess, log.New(this.files[ModeAccess], DefaultPrefixBuilder(ModeAccess), log.LstdFlags))
 	}
 	// Error
 	if this.mode&(ModeError) != 0 {
 		if this.files[ModeError], err = os.OpenFile(DefaultFilenameForModeBuilder(this.path, this.name, ModeError), DefaultFileFlag, DefaultFilePerm); err != nil {
 			return
 		}
-		this.register(ModeError, log.New(this.files[ModeError], strings.ToUpper(ModeName[ModeError])+": ", log.LstdFlags))
+		this.register(ModeError, log.New(this.files[ModeError], DefaultPrefixBuilder(ModeError), log.LstdFlags))
 	}
 	// Debug
 	if this.mode&(ModeDebug) != 0 {
 		if this.files[ModeDebug], err = os.OpenFile(DefaultFilenameForModeBuilder(this.path, this.name, ModeDebug), DefaultFileFlag, DefaultFilePerm); err != nil {
 			return
 		}
-		this.register(ModeDebug, log.New(this.files[ModeDebug], strings.ToUpper(ModeName[ModeDebug])+": ", log.LstdFlags))
+		this.register(ModeDebug, log.New(this.files[ModeDebug], DefaultPrefixBuilder(ModeDebug), log.LstdFlags))
 	}
 
 	return
