@@ -27,18 +27,19 @@ func (this *separateFilesLogger) init(name, path string, mode Mode) {
 func (this *separateFilesLogger) Reset() { // {{{
 	this.baseFileLogger.Reset()
 
-	delete(this.files, ModeAccess)
+	delete(this.files, ModeInfo)
 	delete(this.files, ModeError)
 	delete(this.files, ModeDebug)
+	delete(this.files, ModeAccess)
 } // }}}
 
 func (this *separateFilesLogger) Open() (err error) { // {{{
-	// Access
-	if this.mode&(ModeAccess) != 0 {
-		if this.files[ModeAccess], err = os.OpenFile(DefaultFilenameForModeBuilder(this.path, this.name, ModeAccess), DefaultFileFlag, DefaultFilePerm); err != nil {
+	// Info
+	if this.mode&(ModeInfo) != 0 {
+		if this.files[ModeInfo], err = os.OpenFile(DefaultFilenameForModeBuilder(this.path, this.name, ModeInfo), DefaultFileFlag, DefaultFilePerm); err != nil {
 			return
 		}
-		this.register(ModeAccess, log.New(this.files[ModeAccess], DefaultPrefixBuilder(ModeAccess), log.LstdFlags))
+		this.register(ModeInfo, log.New(this.files[ModeInfo], DefaultPrefixBuilder(ModeInfo), log.LstdFlags))
 	}
 	// Error
 	if this.mode&(ModeError) != 0 {
@@ -53,6 +54,13 @@ func (this *separateFilesLogger) Open() (err error) { // {{{
 			return
 		}
 		this.register(ModeDebug, log.New(this.files[ModeDebug], DefaultPrefixBuilder(ModeDebug), log.LstdFlags))
+	}
+	// Access
+	if this.mode&(ModeAccess) != 0 {
+		if this.files[ModeAccess], err = os.OpenFile(DefaultFilenameForModeBuilder(this.path, this.name, ModeAccess), DefaultFileFlag, DefaultFilePerm); err != nil {
+			return
+		}
+		this.register(ModeAccess, log.New(this.files[ModeAccess], DefaultPrefixBuilder(ModeAccess), log.LstdFlags))
 	}
 
 	return

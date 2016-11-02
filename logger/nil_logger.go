@@ -39,6 +39,12 @@ func (this *nilLogger) Panicf(f string, v ...interface{}) { // {{{
 	panic(fmt.Sprintf(f, v...))
 } // }}}
 
+func (this *nilLogger) Info(v ...interface{}) { // {{{
+} // }}}
+
+func (this *nilLogger) Infof(f string, v ...interface{}) { // {{{
+} // }}}
+
 func (this *nilLogger) Error(v ...interface{}) { // {{{
 } // }}}
 

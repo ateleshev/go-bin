@@ -9,6 +9,7 @@ type Logger interface {
 	Close() error
 
 	PanicLogger
+	InfoLogger
 	ErrorLogger
 	DebugLogger
 	AccessLogger

@@ -31,9 +31,9 @@ func (this *fileLogger) Reset() { // {{{
 func (this *fileLogger) Open() (err error) { // {{{
 	this.file, err = os.OpenFile(DefaultFilenameBuilder(this.path, this.name), DefaultFileFlag, DefaultFilePerm)
 
-	// Access
-	if this.mode&(ModeAccess) != 0 {
-		this.register(ModeAccess, log.New(this.file, DefaultPrefixBuilder(ModeAccess), log.LstdFlags))
+	// Info
+	if this.mode&(ModeInfo) != 0 {
+		this.register(ModeInfo, log.New(this.file, DefaultPrefixBuilder(ModeInfo), log.LstdFlags))
 	}
 	// Error
 	if this.mode&(ModeError) != 0 {
@@ -42,6 +42,10 @@ func (this *fileLogger) Open() (err error) { // {{{
 	// Debug
 	if this.mode&(ModeDebug) != 0 {
 		this.register(ModeDebug, log.New(this.file, DefaultPrefixBuilder(ModeDebug), log.LstdFlags))
+	}
+	// Access
+	if this.mode&(ModeAccess) != 0 {
+		this.register(ModeAccess, log.New(this.file, DefaultPrefixBuilder(ModeAccess), log.LstdFlags))
 	}
 
 	return

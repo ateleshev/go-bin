@@ -5,18 +5,20 @@ type Mode uint8
 // Modes of loggers: (Access | Error | Debug)
 const (
 	// modes quantity
-	ModesQnt = 3
+	ModesQnt = 4
 
-	ModeAccess Mode = 1 << iota
+	ModeInfo Mode = 1 << iota
 	ModeError
 	ModeDebug
+	ModeAccess
 
-	ModeAll        Mode = ModeAccess | ModeError | ModeDebug
-	ModeErrorDebug Mode = ModeError | ModeDebug
+	ModeAll       Mode = ModeInfo | ModeError | ModeDebug | ModeAccess
+	ModeInfoError Mode = ModeInfo | ModeError
 )
 
 var ModeName map[Mode]string = map[Mode]string{
-	ModeAccess: "access",
+	ModeInfo:   "info",
 	ModeError:  "error",
 	ModeDebug:  "debug",
+	ModeAccess: "access",
 }

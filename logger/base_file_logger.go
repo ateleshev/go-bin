@@ -51,6 +51,18 @@ func (this *baseFileLogger) Panicf(f string, v ...interface{}) { // {{{
 	panic(fmt.Sprintf(f, v...))
 } // }}}
 
+func (this *baseFileLogger) Info(v ...interface{}) { // {{{
+	if this.loggers[ModeInfo] != nil {
+		this.loggers[ModeInfo].Print(v...)
+	}
+} // }}}
+
+func (this *baseFileLogger) Infof(f string, v ...interface{}) { // {{{
+	if this.loggers[ModeInfo] != nil {
+		this.loggers[ModeInfo].Printf(f, v...)
+	}
+} // }}}
+
 func (this *baseFileLogger) Error(v ...interface{}) { // {{{
 	if this.loggers[ModeError] != nil {
 		this.loggers[ModeError].Print(v...)
