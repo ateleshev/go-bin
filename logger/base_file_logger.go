@@ -25,13 +25,17 @@ func (this *baseFileLogger) register(mode Mode, logger *log.Logger) { // {{{
 	this.loggers[mode] = logger
 } // }}}
 
-func (this *baseFileLogger) Name() string {
+func (this *baseFileLogger) Name() string { // {{{
 	return this.name
-}
+} // }}}
 
-func (this *baseFileLogger) Mode() Mode {
+func (this *baseFileLogger) Mode() Mode { // {{{
 	return this.mode
-}
+} // }}}
+
+func (this *baseFileLogger) CheckMode(m Mode) bool { // {{{
+	return this.mode&(m) != 0
+} // }}}
 
 func (this *baseFileLogger) Reset() { // {{{
 	this.name = ""

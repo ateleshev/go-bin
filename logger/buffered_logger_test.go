@@ -7,16 +7,16 @@ import (
 	"testing"
 )
 
-func TestSeparateFilesLogger(t *testing.T) {
+func TestBufferedLogger(t *testing.T) {
 	var err error
-	dir, err := ioutil.TempDir("", "test-separate-files-logger_")
+	dir, err := ioutil.TempDir("", "test-buffered-logger_")
 	if err != nil {
 		t.Fatalf("Cannot create tmp dir: %v", err)
 	}
 	defer os.RemoveAll(dir) // clean up
 	// t.Log(dir)
 
-	l := NewSeparateFilesLogger("test", dir, ModeAll)
+	l := NewBufferedLogger(NewSeparateFilesLogger("test", dir, ModeAll), 10)
 	if err = l.Open(); err != nil {
 		t.Fatalf("Cannot open logger: %v", err)
 	}

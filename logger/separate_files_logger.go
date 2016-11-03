@@ -6,12 +6,12 @@ import (
 )
 
 // Use separate files to write logs by mode
-func NewSeparateFilesLogger(name, path string, mode Mode) Logger {
+func NewSeparateFilesLogger(name, path string, mode Mode) Logger { // {{{
 	l := &separateFilesLogger{}
 	l.init(name, path, mode)
 
 	return l
-}
+} // }}}
 
 type separateFilesLogger struct {
 	baseFileLogger
@@ -19,18 +19,17 @@ type separateFilesLogger struct {
 	files map[Mode]*os.File
 }
 
-func (this *separateFilesLogger) init(name, path string, mode Mode) {
+func (this *separateFilesLogger) init(name, path string, mode Mode) { // {{{
 	this.baseFileLogger.init(name, path, mode)
 	this.files = make(map[Mode]*os.File, ModesQnt)
-}
+} // }}}
 
 func (this *separateFilesLogger) Reset() { // {{{
 	this.baseFileLogger.Reset()
 
-	delete(this.files, ModeInfo)
-	delete(this.files, ModeError)
-	delete(this.files, ModeDebug)
-	delete(this.files, ModeAccess)
+	for m := range this.files {
+		delete(this.files, m)
+	}
 } // }}}
 
 func (this *separateFilesLogger) Open() (err error) { // {{{
@@ -66,14 +65,17 @@ func (this *separateFilesLogger) Open() (err error) { // {{{
 	return
 } // }}}
 
-func (this *separateFilesLogger) Close() (err error) { // {{{
-	defer this.Reset()
-
+func (this *separateFilesLogger) Close() error { // {{{
+	errs := make([]error, 0, len(this.files))
 	for _, file := range this.files {
-		if err = file.Close(); err != nil {
-			return
+		if err := file.Close(); err != nil {
+			errs = append(errs, err)
 		}
 	}
 
-	return
+	if len(errs) > 0 {
+		return errs[0]
+	}
+
+	return nil
 } // }}}

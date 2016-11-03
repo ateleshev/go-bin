@@ -7,6 +7,8 @@ const (
 	// modes quantity
 	ModesQnt = 4
 
+	ModeNone Mode = 0
+
 	ModeInfo Mode = 1 << iota
 	ModeError
 	ModeDebug
@@ -16,7 +18,7 @@ const (
 	ModeInfoError Mode = ModeInfo | ModeError
 )
 
-var ModeName map[Mode]string = map[Mode]string{
+var ModeNames map[Mode]string = map[Mode]string{
 	ModeInfo:   "info",
 	ModeError:  "error",
 	ModeDebug:  "debug",

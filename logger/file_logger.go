@@ -52,7 +52,5 @@ func (this *fileLogger) Open() (err error) { // {{{
 } // }}}
 
 func (this *fileLogger) Close() error { // {{{
-	defer this.Reset()
-
 	return this.file.Close()
 } // }}}

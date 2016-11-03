@@ -20,6 +20,10 @@ func (this *nilLogger) Mode() Mode { // {{{
 	return ModeAll
 } // }}}
 
+func (this *nilLogger) CheckMode(m Mode) bool { // {{{
+	return true
+} // }}}
+
 func (this *nilLogger) Reset() { // {{{
 } // }}}
 
